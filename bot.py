@@ -8,7 +8,6 @@ import bd
 def show_listenings(call, complexity, begin=1, permission=False):
     listenings = bd.select_from_bd_listenings(complexity)
     keyboard = types.InlineKeyboardMarkup()
-    print(begin)
     if len(listenings[begin:]) != 0:
         for k, listening in enumerate(listenings[begin:], begin):
             if bd.check_user(listening[0], call.message.chat.id) is False:
@@ -71,7 +70,6 @@ def callback(call):
             global counter
             counter = 0
     elif call.data.split(':')[0].isdigit() and call.data.split(':')[1].isdigit() and call.data.split(':')[2].isdigit() and len(call.data.split(':')) == 3:
-        print(call.data.split(':'))
         question = list(dictionary[int(call.data.split(':')[0])].keys())[int(call.data.split(':')[1])]
         keyboard = types.InlineKeyboardMarkup()
         if dictionary[int(call.data.split(':')[0])][question][int(call.data.split(':')[2])] == dictionary[int(call.data.split(':')[0])][question][-1]:
