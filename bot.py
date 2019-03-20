@@ -3,6 +3,10 @@ from telebot import types
 from lang import lang, NUMBER_OF_LISTENING
 from dictionary import dictionary
 import bd
+from flask import Flask
+import flask
+
+app = Flask(__name__)
 
 
 def show_listenings(call, complexity, begin=1, permission=False):
@@ -24,7 +28,6 @@ def show_listenings(call, complexity, begin=1, permission=False):
 
 
 def main_menu(message):
-    bd.insert_user_to_users(message.chat.username)
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(*[types.InlineKeyboardButton(text=btn, callback_data=btn) for btn in lang['menu_complexity']])
     bot.send_message(message.chat.id, lang["welcome_msg"], reply_markup=keyboard)
@@ -37,7 +40,9 @@ def add_navigation(keyboard, begin, complexity):
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    markup = types.ReplyKeyboardMarkup()
+    if bd.check_user_to_users(message.chat.username) is False:
+        bd.insert_user_to_users(message.chat.username)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add('Main menu')
     bot.send_message(message.chat.id, 'Hello!', reply_markup=markup)
     main_menu(message)
@@ -100,4 +105,34 @@ def callback(call):
         pass
 
 
-bot.polling()
+# bot.polling()
+
+@app.route("/", methods=['POST', 'GET'])
+def test():
+   return 'test'
+
+# Process webhook calls
+@app.route(WEBHOOK_URL_PATH, methods=['POST'])
+def webhook():
+   if flask.request.headers.get('content-type') == 'application/json':
+       json_string = flask.request.get_data().decode('utf-8')
+       update = types.Update.de_json(json_string)
+       bot.process_new_updates([update])
+       return ''
+   else:
+       flask.abort(403)
+
+if __name__ == "__main__":
+   # Start flask server
+   # Remove webhook, it fails sometimes the set if there is a previous webhook
+   bot.remove_webhook()
+   #sleep(1)
+   print(bot.get_webhook_info())
+   #bot.polling()
+   # Set webhook
+   bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+                 certificate=open(WEBHOOK_SSL_CERT, 'r'))
+   app.run(host=WEBHOOK_LISTEN,
+           port=WEBHOOK_PORT,
+           ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
+           threaded=True)

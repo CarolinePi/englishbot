@@ -9,6 +9,20 @@ def insert_user_to_users(nickname):
     conn.close()
 
 
+def check_user_to_users(nickname):
+    conn = sqlite3.connect('db.db', check_same_thread=False)
+    c = conn.cursor()
+    c.execute("SELECT * FROM users WHERE nickname=(?)",
+              [nickname])
+    temp = c.fetchall()
+    if len(temp) != 0:
+        result = True
+    else:
+        result = False
+    conn.close()
+    return result
+
+
 def select_from_bd_listenings(complexity):
     conn = sqlite3.connect('db.db', check_same_thread=False)
     c = conn.cursor()
