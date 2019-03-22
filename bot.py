@@ -68,30 +68,22 @@ def callback(call):
                        caption=lang["information_msg"].format(listening[1], listening[3], listening[4], listening[5], listening[6]))
         for id_question, i in enumerate(dictionary[int(call.data[:-2])]):
             keyboard = types.InlineKeyboardMarkup()
-            for id_answer, j in enumerate(dictionary[int(call.data[:-2])][i][:-1]):
-                keyboard.add(*[types.InlineKeyboardButton(text=j, callback_data=call.data[:-2] + ':' + str(
-                    id_question) + ':' + str(id_answer))])
-            bot.send_message(call.message.chat.id, i, reply_markup=keyboard)
+            keyboard.add(*[types.InlineKeyboardButton(text=lang['choice_btn'][id_answer], callback_data=call.data[:-2] + ':' + str(
+                id_question) + ':' + str(id_answer)) for id_answer, j in enumerate(dictionary[int(call.data[:-2])][i][:-1])])
+            bot.send_message(call.message.chat.id, lang['text_msg'].format(i, *dictionary[int(call.data[:-2])][i][:-1]), reply_markup=keyboard)
             global counter
             counter = 0
     elif call.data.split(':')[0].isdigit() and call.data.split(':')[1].isdigit() and call.data.split(':')[2].isdigit() and len(call.data.split(':')) == 3:
         question = list(dictionary[int(call.data.split(':')[0])].keys())[int(call.data.split(':')[1])]
         keyboard = types.InlineKeyboardMarkup()
         if dictionary[int(call.data.split(':')[0])][question][int(call.data.split(':')[2])] == dictionary[int(call.data.split(':')[0])][question][-1]:
-            for id_answer, j in enumerate(dictionary[int(call.data.split(':')[0])][question][:-1]):
-                if id_answer == int(call.data.split(':')[2]):
-                    keyboard.add(*[types.InlineKeyboardButton(text=j + ' ✅', callback_data=call.data.split(':')[0] + ':' + str(
-                        call.data.split(':')[1]) + ':' + str(id_answer) + ':✅')])
-                else:
-                    keyboard.add(*[types.InlineKeyboardButton(text=j, callback_data=call.data.split(':')[0] + ':' + str(call.data.split(':')[1]) + ':' + str(id_answer))])
+            keyboard.add(*[types.InlineKeyboardButton(text=lang['choice_btn'][id_answer] + ' ✅', callback_data=call.data.split(':')[0] + ':' + str(
+                call.data.split(':')[1]) + ':' + str(id_answer) + ':✅') if id_answer == int(call.data.split(':')[2]) else types.InlineKeyboardButton(text=lang['choice_btn'][id_answer], callback_data=call.data.split(':')[0] + ':' + str(
+                    call.data.split(':')[1]) + ':' + str(id_answer)) for id_answer, j in enumerate(dictionary[int(call.data.split(':')[0])][question][:-1])])
         else:
-            for id_answer, j in enumerate(dictionary[int(call.data.split(':')[0])][question][:-1]):
-                if id_answer == int(call.data.split(':')[2]):
-                    keyboard.add(*[types.InlineKeyboardButton(text=j + ' ❌', callback_data=call.data.split(':')[0] + ':' + str(
-                        call.data.split(':')[1]) + ':' + str(id_answer) + ':❌')])
-                else:
-                    keyboard.add(*[types.InlineKeyboardButton(text=j, callback_data=call.data.split(':')[0] + ':' + str(
-                        call.data.split(':')[1]) + ':' + str(id_answer))])
+            keyboard.add(*[types.InlineKeyboardButton(text=lang['choice_btn'][id_answer] + ' ❌', callback_data=call.data.split(':')[0] + ':' + str(
+                call.data.split(':')[1]) + ':' + str(id_answer) + ':❌') if id_answer == int(call.data.split(':')[2]) else types.InlineKeyboardButton(text=lang['choice_btn'][id_answer], callback_data=call.data.split(':')[0] + ':' + str(
+                    call.data.split(':')[1]) + ':' + str(id_answer)) for id_answer, j in enumerate(dictionary[int(call.data.split(':')[0])][question][:-1])])
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id, reply_markup=keyboard)
         counter += 1
         if counter == len(dictionary[int(call.data.split(':')[0])]):

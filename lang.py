@@ -5,7 +5,9 @@ lang = {
     "information_msg": '*{}*\nType: *{}*, speakers: *{}*, length: *{}*, complexity: *{}*. ',
     "listenings_msg": "Please, choose listening.",
     "navigation_btn": ['⬅ ️', '➡ ️'],
-    "choice": [' ❌', ' ✅']
+    "choice": [' ❌', ' ✅'],
+    "choice_btn": ['A', 'B', 'C'],
+    "text_msg": '{}\n A: {}\n B: {}\n C: {}'
 }
 
 NUMBER_OF_LISTENING = 6
